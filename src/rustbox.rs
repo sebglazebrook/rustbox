@@ -51,6 +51,15 @@ pub enum InputMode {
     AltMouse = 0x06
 }
 
+#[derive(Clone, Copy, Debug)]
+pub enum OutputMode {
+     Current = 0,
+     Normal = 1,
+     EightBit = 2,  // 256 Colors
+     WebSafe = 3,   // 216 Colors
+     Grayscale = 4,
+}
+
 #[derive(Clone, Copy, PartialEq)]
 #[repr(C,u16)]
 pub enum Color {
@@ -225,6 +234,11 @@ pub struct InitOptions {
     /// See InputMode enum for details on the variants.
     pub input_mode: InputMode,
 
+    /// Use this option to initialize with a specific output mode
+    ///
+    /// See OutputMode enum for details on the variants.
+    pub output_mode: OutputMode,
+
     /// Use this option to automatically buffer stderr while RustBox is running.  It will be
     /// written when RustBox exits.
     ///
@@ -239,6 +253,7 @@ impl Default for InitOptions {
     fn default() -> Self {
         InitOptions {
             input_mode: InputMode::Current,
+            output_mode: OutputMode::Current,
             buffer_stderr: false,
         }
     }
@@ -327,6 +342,10 @@ impl RustBox {
             InputMode::Current => (),
             _ => rb.set_input_mode(opts.input_mode),
         }
+        match opts.output_mode {
+            OutputMode::Current => (),
+            _ => rb.set_output_mode(opts.output_mode),
+        }
         Ok(rb)
     }
 
@@ -391,6 +410,12 @@ impl RustBox {
     pub fn set_input_mode(&self, mode: InputMode) {
         unsafe {
             termbox::tb_select_input_mode(mode as c_int);
+        }
+    }
+
+    pub fn set_output_mode(&self, mode: OutputMode) {
+        unsafe {
+            termbox::tb_select_output_mode(mode as c_int);
         }
     }
 }

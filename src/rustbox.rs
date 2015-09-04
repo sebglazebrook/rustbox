@@ -1,3 +1,4 @@
+#![feature(associated_consts)]
 extern crate gag;
 extern crate libc;
 extern crate num;
@@ -60,35 +61,23 @@ pub enum OutputMode {
      Grayscale = 4,
 }
 
-pub trait TestTrait {
-    fn as_u16(&self) -> u16;
-}
-
 #[derive(Clone, Copy, PartialEq)]
 #[repr(C,u16)]
-pub enum Color {
-    Default = 0x00,
-    Black = 0x01,
-    Red = 0x02,
-    Green = 0x03,
-    Yellow = 0x04,
-    Blue = 0x05,
-    Magenta = 0x06,
-    Cyan = 0x07,
-    White = 0x08,
+pub struct Color {
+    pub value: u16,
 }
+ 
+impl Color {
+    pub const Default: Color = Color{ value:  0x00}; 
+    pub const Black: Color = Color{value: 0x01};
+    pub const Red: Color = Color{value: 0x02};
+    pub const Green: Color = Color{value: 0x03};
+    pub const Yellow: Color = Color{value: 0x04};
+    pub const Blue: Color = Color{value: 0x05};
+    pub const Magenta: Color = Color{value: 0x06};
+    pub const Cyan: Color = Color{value: 0x07};
+    pub const White: Color = Color{value: 0x08};
 
-pub struct ColorValue {
-    value: u16,
-}
-
-impl TestTrait for Color {
-    fn as_u16(&self) -> u16 {
-        self.clone() as u16
-    }
-}
-
-impl TestTrait for ColorValue {
     fn as_u16(&self) -> u16 {
         self.value as u16
     }
@@ -109,7 +98,7 @@ mod style {
 
     impl Style {
         //pub fn from_color(color: super::Color) -> Style {
-        pub fn from_color<T: super::TestTrait>(color: T) -> Style {
+        pub fn from_color(color: super::Color) -> Style {
             Style { bits: color.as_u16() & TB_NORMAL_COLOR.bits }
         }
     }
@@ -394,8 +383,7 @@ impl RustBox {
         termbox::tb_change_cell(x as c_int, y as c_int, ch, fg, bg)
     }
 
-    //pub fn print(&self, x: usize, y: usize, sty: Style, fg: Color, bg: Color, s: &str) {
-    pub fn print<T: TestTrait>(&self, x: usize, y: usize, sty: Style, fg: T, bg: T, s: &str) {
+    pub fn print(&self, x: usize, y: usize, sty: Style, fg: Color, bg: Color, s: &str) {
         let fg = Style::from_color(fg) | (sty & style::TB_ATTRIB);
         let bg = Style::from_color(bg);
         for (i, ch) in s.chars().enumerate() {
@@ -405,8 +393,7 @@ impl RustBox {
         }
     }
 
-    //pub fn print_char(&self, x: usize, y: usize, sty: Style, fg: Color, bg: Color, ch: char) {
-    pub fn print_char<T: TestTrait>(&self, x: usize, y: usize, sty: Style, fg: T, bg: T, ch: char) {
+    pub fn print_char(&self, x: usize, y: usize, sty: Style, fg: Color, bg: Color, ch: char) {
         let fg = Style::from_color(fg) | (sty & style::TB_ATTRIB);
         let bg = Style::from_color(bg);
         unsafe {

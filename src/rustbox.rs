@@ -63,15 +63,15 @@ pub enum OutputMode {
 #[derive(Clone, Copy, PartialEq)]
 #[repr(C,u16)]
 pub enum Color {
-    Default =  0x00,
-    Black =    0x01,
-    Red =      0x02,
-    Green =    0x03,
-    Yellow =   0x04,
-    Blue =     0x05,
-    Magenta =  0x06,
-    Cyan =     0x07,
-    White =    0x08,
+    Default,
+    Black,
+    Red,
+    Green,
+    Yellow,
+    Blue,
+    Magenta,
+    Cyan,
+    White,
 }
 
 mod style {
